@@ -305,8 +305,8 @@ const Chat = () => {
       >
         <div className="flex items-center gap-3">
           <img
-            src="/cricket-logo.png"
-            alt="Cricket Chat"
+            src="/logo.png"
+            alt="CricChronicles Logo"
             className="w-10 h-10"
             style={{
               filter: isDarkMode
