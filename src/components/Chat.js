@@ -153,7 +153,7 @@ const Chat = () => {
       toolCalls.map(async (toolCall) => {
         const result = await functionCallHandler(toolCall);
         debugger;
-        if (result?.length == 0) {
+        if (!result) {
           return { output: "query failed", tool_call_id: toolCall.id };
         }
         return { output: result, tool_call_id: toolCall.id };
