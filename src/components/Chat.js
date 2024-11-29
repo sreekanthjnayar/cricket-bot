@@ -2,88 +2,113 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { AssistantStream } from "openai/lib/AssistantStream";
-const UserMessage = ({ text }) => {
-  return (
-    <div className="flex justify-end mb-4">
-      <div
-        className="rounded-3xl py-3 px-6 max-w-[70%] origin-bottom-right
+
+const Chat = () => {
+  const UserMessage = ({ text }) => {
+    return (
+      <div className="flex justify-end mb-4">
+        <div
+          className="rounded-3xl py-3 px-6 max-w-[70%] origin-bottom-right
         bg-gradient-to-r from-[#BBFDAB] to-[#A1E3ED] text-[#011012]
          border-[#BBFDAB]/20 backdrop-blur-sm
         shadow-neon-green"
-        style={{
-          backfaceVisibility: "hidden",
-        }}
-      >
-        {text}
+          style={{
+            backfaceVisibility: "hidden",
+          }}
+        >
+          {text}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-const AssistantMessage = ({ text }) => {
-  return (
-    <div className="flex justify-start mb-4">
-      <div
-        className="animate-message-popup rounded-3xl py-3 px-6 max-w-[70%] origin-bottom-left
+  const AssistantMessage = ({ text }) => {
+    return (
+      <div className="flex justify-start mb-4">
+        <div
+          className="animate-message-popup rounded-3xl py-3 px-6 max-w-[70%] origin-bottom-left
         bg-gradient-to-r from-[#0FA8AB] to-[#035F6E] text-white
         border border-[#A1E3ED]/20 backdrop-blur-sm
         shadow-neon-teal"
-        style={{
-          backfaceVisibility: "hidden",
-        }}
-      >
-        {text}
+          style={{
+            backfaceVisibility: "hidden",
+          }}
+        >
+          {text}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-const Message = ({ role, text }) => {
-  switch (role) {
-    case "user":
-      return <UserMessage text={text} />;
-    case "assistant":
-      return <AssistantMessage text={text} />;
-    default:
-      return null;
-  }
-};
-
-async function sendQuery(query) {
-  try {
-    const response = await fetch("/api/database", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
+  const Message = ({ role, text }) => {
+    switch (role) {
+      case "user":
+        return <UserMessage text={text} />;
+      case "assistant":
+        return <AssistantMessage text={text} />;
+      default:
+        return null;
     }
+  };
 
-    const data = await response.json();
-    console.log("Query Results:", data);
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    return null;
+  const LoadingAnimation = () => {
+    return (
+      <div className="flex justify-center items-center">
+        <img
+          src="/ballAnimation.gif"
+          alt="Cricket Ball"
+          className="
+            [filter:drop-shadow(0_0_8px_#A1E3ED)_brightness(1.3)]"
+          style={{
+            filter: `
+              drop-shadow(0 0 4px #A1E3ED) 
+              drop-shadow(0 0 4px #A1E3ED) 
+              brightness(1.3)
+            `,
+          }}
+        />
+      </div>
+    );
+  };
+
+  async function sendQuery(query) {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/database", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const data = await response.json();
+      console.log("Query Results:", data);
+      return data;
+    } catch (error) {
+      console.error("Error:", error);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
   }
-}
-const functionCallHandler = async (toolCall) => {
-  if (!toolCall || toolCall.function.name !== "query_database") return;
-  const arg = await JSON.parse(toolCall.function.arguments);
-  const { query } = arg;
-  const result = await sendQuery(query);
-  console.log(result);
-  return result;
-};
+  const functionCallHandler = async (toolCall) => {
+    if (!toolCall || toolCall.function.name !== "query_database") return;
+    const arg = await JSON.parse(toolCall.function.arguments);
+    const { query } = arg;
+    const result = await sendQuery(query);
+    console.log(result);
+    return result;
+  };
 
-const Chat = () => {
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
@@ -214,6 +239,7 @@ const Chat = () => {
         {messages.map((msg, index) => (
           <Message key={index} role={msg.role} text={msg.text} />
         ))}
+        {isLoading && <LoadingAnimation />}
         <div ref={messagesEndRef} />
       </div>
       <form
