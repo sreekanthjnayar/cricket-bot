@@ -56,12 +56,11 @@ async function sendQuery(query) {
 }
 const functionCallHandler = async (toolCall) => {
   if (!toolCall || toolCall.function.name !== "query_database") return;
-  debugger;
   const arg = await JSON.parse(toolCall.function.arguments);
   const { query } = arg;
   const result = await sendQuery(query);
   console.log(result);
-  return Promise.resolve('{"weekday":"Friday","score_sum":"2345"}');
+  return result;
 };
 
 const Chat = () => {
@@ -154,6 +153,9 @@ const Chat = () => {
       toolCalls.map(async (toolCall) => {
         const result = await functionCallHandler(toolCall);
         debugger;
+        if (result?.length == 0) {
+          return { output: "query failed", tool_call_id: toolCall.id };
+        }
         return { output: result, tool_call_id: toolCall.id };
       })
     );

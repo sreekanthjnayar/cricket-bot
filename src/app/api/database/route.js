@@ -6,9 +6,9 @@ export async function POST(request) {
 
   // Validation: Ensure the query is safe
   if (
-    !sql ||
-    typeof sql !== "string" ||
-    !sql.trim().toLowerCase().startsWith("select")
+    !query ||
+    typeof query !== "string" ||
+    !query.trim().toLowerCase().startsWith("select")
   ) {
     return new Response(`Invalid query`, {
       status: 400,
