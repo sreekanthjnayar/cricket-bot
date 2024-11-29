@@ -155,7 +155,7 @@ const Chat = () => {
         if (!result) {
           return { output: "query failed", tool_call_id: toolCall.id };
         }
-        return { output: result, tool_call_id: toolCall.id };
+        return { output: JSON.stringify(result), tool_call_id: toolCall.id };
       })
     );
     setInputDisabled(true);
