@@ -152,7 +152,6 @@ const Chat = () => {
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall) => {
         const result = await functionCallHandler(toolCall);
-        debugger;
         if (!result) {
           return { output: "query failed", tool_call_id: toolCall.id };
         }
