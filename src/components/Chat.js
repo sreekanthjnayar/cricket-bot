@@ -33,16 +33,15 @@ const Message = ({ role, text }) => {
   }
 };
 
-async function sendQuery(query, params) {
+async function sendQuery(query) {
   try {
     const response = await fetch("/api/database", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ sql: query, params }),
+      body: JSON.stringify({ query }),
     });
-
     if (!response.ok) {
       throw new Error("Failed to fetch data");
     }
