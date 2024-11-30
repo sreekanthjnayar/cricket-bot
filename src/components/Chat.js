@@ -344,7 +344,7 @@ const Chat = () => {
           borderTop: `1px solid ${theme.border}30`,
         }}
       >
-        <div className="relative flex items-center">
+        <div className="relative flex items-center mb-3">
           <input
             type="text"
             className="text-md w-full focus:outline-none 
