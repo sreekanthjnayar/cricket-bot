@@ -10,7 +10,7 @@ export async function POST(request) {
     typeof query !== "string" ||
     !query.trim().toLowerCase().startsWith("select")
   ) {
-    return new Response(`Invalid query`, {
+    return Response(`Invalid query`, {
       status: 400,
     });
   }
@@ -19,8 +19,10 @@ export async function POST(request) {
     const results = await sql(query);
     return Response.json({ results });
   } catch (error) {
-    return new Response(`database error: ${error.message}`, {
-      status: 400,
+    // Log the error for server-side tracking
+
+    return Response.json({
+      message: `Database error: ${error.message}`,
     });
   }
 }
