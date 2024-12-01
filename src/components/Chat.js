@@ -16,7 +16,6 @@ const Chat = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const theme = isDarkMode ? darkTheme : lightTheme;
 
-  // Add Theme Toggle Button
   const ThemeToggle = () => {
     return (
       <button
@@ -63,7 +62,6 @@ const Chat = () => {
     );
   };
 
-  // Update Message components to use theme
   const UserMessage = ({ text }) => {
     return (
       <div className="flex justify-end mb-4 mt-2 w-full">
@@ -80,24 +78,32 @@ const Chat = () => {
             {text}
           </div>
           <div
+            className="relative flex items-center justify-center"
             style={{
-              height: 32,
-              width: 32,
+              height: 40,
+              width: 40,
               borderRadius: "50%",
-              border: theme.border,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              background: `linear-gradient(135deg, ${theme.message.user.from}40, ${theme.message.user.to}40)`,
+              border: `2px solid ${theme.message.user.from}50`,
+              boxShadow: `0 2px 8px ${theme.message.user.from}30`,
             }}
           >
             <img
               src="/person-icon.png"
+              alt="User Avatar"
+              className="object-cover transition-all duration-200"
               style={{
-                height: 16,
-                width: "auto",
-                filter: isDarkMode ? "invert(1)" : "invert(0)",
+                height: 28,
+                width: 28,
+                filter: isDarkMode ? "brightness(1.2)" : "none",
               }}
-            ></img>
+            />
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `radial-gradient(circle at center, ${theme.message.user.from}10, transparent 70%)`,
+              }}
+            />
           </div>
         </div>
       </div>
@@ -109,24 +115,32 @@ const Chat = () => {
       <div className="flex justify-start mb-4">
         <div className="flex items-end justify-start">
           <div
+            className="relative flex items-center justify-center"
             style={{
-              height: 32,
-              width: 32,
+              height: 40,
+              width: 40,
               borderRadius: "50%",
-              border: theme.border,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              background: `linear-gradient(135deg, ${theme.message.assistant.from}40, ${theme.message.assistant.to}40)`,
+              border: `2px solid ${theme.message.assistant.from}50`,
+              boxShadow: `0 2px 8px ${theme.message.assistant.from}30`,
             }}
           >
             <img
               src="/bot-icon.png"
+              alt="AI Assistant"
+              className="object-cover transition-all duration-200"
               style={{
-                height: 24,
-                width: "auto",
-                filter: isDarkMode ? "invert(1)" : "invert(0)",
+                height: 28,
+                width: 28,
+                filter: isDarkMode ? "brightness(1.2)" : "none",
               }}
-            ></img>
+            />
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `radial-gradient(circle at center, ${theme.message.assistant.from}10, transparent 70%)`,
+              }}
+            />
           </div>
           <div
             className={`animate-message-popup rounded-3xl py-3 px-6 max-w-[80%] origin-bottom-left
@@ -155,7 +169,6 @@ const Chat = () => {
     }
   };
 
-  // Update LoadingAnimation to use theme
   const LoadingAnimation = () => {
     return (
       <img
