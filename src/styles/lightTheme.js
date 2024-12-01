@@ -1,7 +1,7 @@
 export const lightTheme = {
   background: "#FFFFFF",
   headerBg: "#FFFFFF/90",
-  border: "#E2E8F0",
+  border: "1px solid #888",
   text: {
     primary: "#1E293B",
     secondary: "#64748B",

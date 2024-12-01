@@ -1,7 +1,7 @@
 export const darkTheme = {
   background: "#011012",
   headerBg: "#011012/90",
-  border: "#035F6E",
+  border: "1px solid #FFF",
   text: {
     primary: "#A1E3ED",
     secondary: "#035F6E",

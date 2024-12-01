@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { darkTheme } from "../styles/darkTheme";
 import { lightTheme } from "../styles/lightTheme";
 import { AssistantStream } from "openai/lib/AssistantStream";
+import { v4 as uuidv4 } from "uuid";
 
 const Chat = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const theme = isDarkMode ? darkTheme : lightTheme;
 
   // Add Theme Toggle Button
@@ -59,17 +60,39 @@ const Chat = () => {
   // Update Message components to use theme
   const UserMessage = ({ text }) => {
     return (
-      <div className="flex justify-end mb-4 mt-2">
-        <div
-          className={`rounded-3xl py-3 px-6 max-w-[70%] origin-bottom-right
-            backdrop-blur-sm ${theme.message.user.shadow}`}
-          style={{
-            background: `linear-gradient(to right, ${theme.message.user.from}, ${theme.message.user.to})`,
-            color: theme.message.user.text,
-            backfaceVisibility: "hidden",
-          }}
-        >
-          {text}
+      <div className="flex justify-end mb-4 mt-2 w-full">
+        <div className="flex items-end justify-end">
+          <div
+            className={`rounded-3xl py-3 px-6 max-w-[80%] origin-bottom-right
+            backdrop-blur-sm ${theme.message.user.shadow} mr-1`}
+            style={{
+              background: `linear-gradient(to right, ${theme.message.user.from}, ${theme.message.user.to})`,
+              color: theme.message.user.text,
+              backfaceVisibility: "hidden",
+            }}
+          >
+            {text}
+          </div>
+          <div
+            style={{
+              height: 32,
+              width: 32,
+              borderRadius: "50%",
+              border: theme.border,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <img
+              src="/person-icon.png"
+              style={{
+                height: 16,
+                width: "auto",
+                filter: isDarkMode ? "invert(1)" : "invert(0)",
+              }}
+            ></img>
+          </div>
         </div>
       </div>
     );
@@ -78,16 +101,38 @@ const Chat = () => {
   const AssistantMessage = ({ text }) => {
     return (
       <div className="flex justify-start mb-4">
-        <div
-          className={`animate-message-popup rounded-3xl py-3 px-6 max-w-[70%] origin-bottom-left
-            backdrop-blur-sm ${theme.message.assistant.shadow}`}
-          style={{
-            background: `linear-gradient(to right, ${theme.message.assistant.from}, ${theme.message.assistant.to})`,
-            color: theme.message.assistant.text,
-            backfaceVisibility: "hidden",
-          }}
-        >
-          {text}
+        <div className="flex items-end justify-start">
+          <div
+            style={{
+              height: 32,
+              width: 32,
+              borderRadius: "50%",
+              border: theme.border,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <img
+              src="/bot-icon.png"
+              style={{
+                height: 24,
+                width: "auto",
+                filter: isDarkMode ? "invert(1)" : "invert(0)",
+              }}
+            ></img>
+          </div>
+          <div
+            className={`animate-message-popup rounded-3xl py-3 px-6 max-w-[80%] origin-bottom-left
+            backdrop-blur-sm ${theme.message.assistant.shadow} ml-1`}
+            style={{
+              background: `linear-gradient(to right, ${theme.message.assistant.from}, ${theme.message.assistant.to})`,
+              color: theme.message.assistant.text,
+              backfaceVisibility: "hidden",
+            }}
+          >
+            {text}
+          </div>
         </div>
       </div>
     );
@@ -107,25 +152,14 @@ const Chat = () => {
   // Update LoadingAnimation to use theme
   const LoadingAnimation = () => {
     return (
-      <div className="flex justify-center items-center my-4">
-        <img
-          src="/ballAnimation.gif"
-          alt="Cricket Ball"
-          className=""
-          style={{
-            filter: isDarkMode
-              ? `
-                  drop-shadow(0 0 4px ${theme.text.primary}) 
-                  drop-shadow(0 0 4px ${theme.text.primary}) 
-                  brightness(1.3)
-                `
-              : `
-                  drop-shadow(0 0 4px ${theme.message.user.from}) 
-                  brightness(1.1)
-                `,
-          }}
-        />
-      </div>
+      <img
+        src="/ballAnimation.gif"
+        alt="Cricket Ball"
+        className=""
+        style={{
+          width: 48,
+        }}
+      />
     );
   };
 
@@ -142,17 +176,16 @@ const Chat = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
-
       const data = await response.json();
       console.log("Query Results:", data);
       return data;
     } catch (error) {
+      setIsLoading(false);
       console.error("Error:", error);
       return null;
-    } finally {
-      setIsLoading(false);
     }
   }
+
   const functionCallHandler = async (toolCall) => {
     if (!toolCall || toolCall.function.name !== "query_database") return;
     const arg = await JSON.parse(toolCall.function.arguments);
@@ -222,7 +255,7 @@ const Chat = () => {
     sendMessage(userInput);
     setMessages((prevMessages) => [
       ...prevMessages,
-      { role: "user", text: userInput },
+      { role: "user", text: userInput, msgId: uuidv4() },
     ]);
     setUserInput("");
     setInputDisabled(true);
@@ -262,6 +295,7 @@ const Chat = () => {
   };
 
   const handleRunCompleted = () => {
+    setIsLoading(false);
     setInputDisabled(false);
   };
 
@@ -288,7 +322,10 @@ const Chat = () => {
   };
 
   const appendMessage = (role, text) => {
-    setMessages((prevMessages) => [...prevMessages, { role, text }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role, text, msgId: uuidv4() },
+    ]);
   };
 
   return (
@@ -297,10 +334,11 @@ const Chat = () => {
       style={{ background: theme.background }}
     >
       <header
-        className="border-b px-6 py-4 backdrop-blur-sm"
+        className="border-b px-6 py-4 backdrop-blur-sm fixed w-full"
         style={{
-          borderColor: `${theme.border}30`,
+          borderColor: `${theme.border}`,
           background: theme.headerBg,
+          zIndex: 999,
         }}
       >
         <div className="flex items-center gap-3">
@@ -329,17 +367,22 @@ const Chat = () => {
         <ThemeToggle />
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4">
+      <div
+        className="overflow-y-auto px-4 mt-24"
+        style={{
+          minHeight: "calc(100vh - 184px)",
+          height: "calc(100vh - 184px)",
+        }}
+      >
         {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} text={msg.text} />
+          <Message key={msg.msgId} role={msg.role} text={msg.text} />
         ))}
-        {isLoading && <LoadingAnimation />}
         <div ref={messagesEndRef} />
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="px-4 pt-4 mb-2 sm:mb-0"
+        className="sm:mb-0 fixed bottom-0 w-full p-3"
         style={{
           borderTop: `1px solid ${theme.border}30`,
         }}
@@ -362,35 +405,46 @@ const Chat = () => {
             }}
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Enter your question"
+            placeholder="Hi there, am CricChronicles. Here are some things you can ask me -which player had the maximum 5 wicket hauls the last 3 years?"
           />
 
-          <button
-            type="submit"
-            disabled={inputDisabled}
-            className="absolute right-2 inline-flex items-center justify-center 
+          {!isLoading && (
+            <button
+              type="submit"
+              disabled={inputDisabled}
+              className="absolute right-2 inline-flex items-center justify-center 
               rounded-full h-12 w-12 transition-all duration-200 ease-in-out
               hover:scale-105 focus:outline-none 
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            style={{
-              background: `linear-gradient(to right, ${theme.button.from}, ${theme.button.to})`,
-              boxShadow: isDarkMode
-                ? `0 0 10px ${theme.button.from}40`
-                : `0 2px 4px ${theme.button.from}20`,
-              ":hover": {
-                background: `linear-gradient(to right, ${theme.button.hover.from}, ${theme.button.hover.to})`,
-              },
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-6 h-6 text-white"
+              style={{
+                background: `linear-gradient(to right, ${theme.button.from}, ${theme.button.to})`,
+                boxShadow: isDarkMode
+                  ? `0 0 10px ${theme.button.from}40`
+                  : `0 2px 4px ${theme.button.from}20`,
+                ":hover": {
+                  background: `linear-gradient(to right, ${theme.button.hover.from}, ${theme.button.hover.to})`,
+                },
+              }}
             >
-              <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6 text-white"
+              >
+                <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+              </svg>
+            </button>
+          )}
+          {isLoading && (
+            <button
+              disabled={true}
+              className="absolute right-2 inline-flex items-center justify-center 
+              rounded-full"
+            >
+              <LoadingAnimation></LoadingAnimation>
+            </button>
+          )}
         </div>
       </form>
     </div>
