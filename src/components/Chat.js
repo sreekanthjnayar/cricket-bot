@@ -7,6 +7,12 @@ import { AssistantStream } from "openai/lib/AssistantStream";
 import { v4 as uuidv4 } from "uuid";
 
 const Chat = () => {
+  const [userInput, setUserInput] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [inputDisabled, setInputDisabled] = useState(false);
+  const [threadId, setThreadId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const theme = isDarkMode ? darkTheme : lightTheme;
 
@@ -195,13 +201,6 @@ const Chat = () => {
     return result;
   };
 
-  const [userInput, setUserInput] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [inputDisabled, setInputDisabled] = useState(false);
-  const [threadId, setThreadId] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -345,7 +344,7 @@ const Chat = () => {
           <img
             src="/logo.png"
             alt="CricChronicles Logo"
-            className="w-10 h-10"
+            className="w-12 h-12"
             style={{
               filter: isDarkMode
                 ? "drop-shadow(0 0 4px #A1E3ED) brightness(1.3)"
