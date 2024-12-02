@@ -33,5 +33,5 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - NLP: Open AI
 
 ## Links:
-- Code Repository : [https://github.com/sreekanthjnayar/cricket-bot]
-- Application Link : [https://cricket-bot.vercel.app/]
+- Code Repository : https://github.com/sreekanthjnayar/cricket-bot
+- Application Link : https://cricket-bot.vercel.app/
